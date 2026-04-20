@@ -1,5 +1,9 @@
 #include "character.h"
+#ifdef M5STACK_FIRE
+#include <M5Stack.h>
+#else
 #include <M5StickCPlus.h>
+#endif
 #include <LittleFS.h>
 #include <AnimatedGIF.h>
 #include <ArduinoJson.h>

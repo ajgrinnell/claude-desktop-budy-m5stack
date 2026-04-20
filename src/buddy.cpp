@@ -1,6 +1,10 @@
 #include "buddy.h"
 #include "buddy_common.h"
+#ifdef M5STACK_FIRE
+#include <M5Stack.h>
+#else
 #include <M5StickCPlus.h>
+#endif
 #include <string.h>
 
 extern TFT_eSprite spr;
@@ -9,8 +13,13 @@ extern TFT_eSprite spr;
 enum { B_SLEEP, B_IDLE, B_BUSY, B_ATTENTION, B_CELEBRATE, B_DIZZY, B_HEART };
 
 // ──────────────── shared geometry ────────────────
+#ifdef M5STACK_FIRE
+const int BUDDY_X_CENTER = 160;   // center of 320px landscape screen
+const int BUDDY_CANVAS_W = 320;
+#else
 const int BUDDY_X_CENTER = 67;
 const int BUDDY_CANVAS_W = 135;
+#endif
 const int BUDDY_Y_BASE   = 30;
 const int BUDDY_Y_OVERLAY = 6;
 const int BUDDY_CHAR_W   = 6;

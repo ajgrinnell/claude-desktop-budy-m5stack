@@ -72,7 +72,11 @@ const char* petName();
 void ownerSet(const char* name);
 const char* ownerName();
 #include "stats.h"
+#ifdef M5STACK_FIRE
+#include <M5Stack.h>
+#else
 #include <M5StickCPlus.h>
+#endif
 
 inline bool xferCommand(JsonDocument& doc) {
   const char* cmd = doc["cmd"];
@@ -110,8 +114,25 @@ inline bool xferCommand(JsonDocument& doc) {
   }
 
   if (strcmp(cmd, "status") == 0) {
-    // Dump everything the info screens show. Manual printf rather than
-    // ArduinoJson serialize — less heap churn, and the shape is fixed.
+#ifdef M5STACK_FIRE
+    bool charging = M5.Power.isCharging();
+    char b[320];
+    int len = snprintf(b, sizeof(b),
+      "{\"ack\":\"status\",\"ok\":true,\"n\":0,\"data\":{"
+      "\"name\":\"%s\",\"owner\":\"%s\",\"sec\":%s,"
+      "\"bat\":{\"pct\":-1,\"mV\":-1,\"mA\":-1,\"usb\":%s},"
+      "\"sys\":{\"up\":%lu,\"heap\":%u,\"fsFree\":%lu,\"fsTotal\":%lu},"
+      "\"stats\":{\"appr\":%u,\"deny\":%u,\"vel\":%u,\"nap\":%lu,\"lvl\":%u}"
+      "}}\n",
+      petName(), ownerName(), bleSecure() ? "true" : "false",
+      charging ? "true" : "false",
+      millis() / 1000, ESP.getFreeHeap(),
+      (unsigned long)(LittleFS.totalBytes() - LittleFS.usedBytes()),
+      (unsigned long)LittleFS.totalBytes(),
+      stats().approvals, stats().denials, statsMedianVelocity(),
+      (unsigned long)stats().napSeconds, stats().level
+    );
+#else
     int vBat = (int)(M5.Axp.GetBatVoltage() * 1000);
     int iBat = (int)M5.Axp.GetBatCurrent();
     int vBus = (int)(M5.Axp.GetVBusVoltage() * 1000);
@@ -133,6 +154,7 @@ inline bool xferCommand(JsonDocument& doc) {
       stats().approvals, stats().denials, statsMedianVelocity(),
       (unsigned long)stats().napSeconds, stats().level
     );
+#endif
     Serial.write(b, len);
     bleWrite((const uint8_t*)b, len);
     return true;
