@@ -1,6 +1,6 @@
 #ifdef M5STACK_FIRE
 #include <M5Stack.h>
-#include <FastLED.h>
+#include <Adafruit_NeoPixel.h>
 #else
 #include <M5StickCPlus.h>
 #endif
@@ -42,15 +42,12 @@ const uint16_t PANEL = 0x2104;   // overlay panel background
 #ifdef M5STACK_FIRE
 #define FIRE_LED_PIN 15
 #define FIRE_LED_NUM 10
-static CRGB _fireLeds[FIRE_LED_NUM];
-static void ledInit() {
-  FastLED.addLeds<WS2812B, FIRE_LED_PIN, GRB>(_fireLeds, FIRE_LED_NUM);
-  FastLED.clear(); FastLED.show();
-}
-static void ledOff()  { FastLED.clear(); FastLED.show(); }
-static void ledPulse(bool on) {
-  _fireLeds[0] = on ? CRGB(255, 40, 0) : CRGB::Black;
-  FastLED.show();
+static Adafruit_NeoPixel _strip(FIRE_LED_NUM, FIRE_LED_PIN, NEO_GRB + NEO_KHZ800);
+static void ledInit()        { _strip.begin(); _strip.clear(); _strip.show(); }
+static void ledOff()         { _strip.clear(); _strip.show(); }
+static void ledPulse(bool on){
+  _strip.setPixelColor(0, on ? _strip.Color(255, 40, 0) : 0);
+  _strip.show();
 }
 #else
 const int LED_PIN = 10;          // red LED, active-low
