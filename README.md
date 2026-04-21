@@ -1,17 +1,23 @@
-# claude-desktop-buddy
+# claude-desktop-buddy — M5Stack Core Fire port
 
-Claude for macOS and Windows can connect Claude Cowork and Claude Code to
+This is a port of [claude-desktop-buddy](https://github.com/anthropics/claude-desktop-buddy)
+by **[Felix Rieseberg](https://github.com/felixrieseberg)** to the
+**M5Stack Core Fire**. All credit for the original concept, firmware
+architecture, ASCII pets, GIF character system, and BLE protocol goes to
+Felix. This fork adds a second PlatformIO build target (`m5stack-fire`)
+while keeping the original M5StickC Plus target (`m5stickc-plus`) intact.
+
+---
+
+Claude for macOS and Windows can connect Claude Code and Claude Desktop to
 maker devices over BLE, so developers and makers can build hardware that
-displays permission prompts, recent messages, and other interactions. We've
-been impressed by the creativity of the maker community around Claude -
-providing a lightweight, opt-in API is our way of making it easier to build
-fun little hardware devices that integrate with Claude.
+displays permission prompts, recent messages, and other interactions.
 
 > **Building your own device?** You don't need any of the code here. See
 > **[REFERENCE.md](REFERENCE.md)** for the wire protocol: Nordic UART
 > Service UUIDs, JSON schemas, and the folder push transport.
 
-As an example, we built a desk pet on ESP32 that lives off permission
+The firmware implements a desk pet on ESP32 that lives off permission
 approvals and interaction with Claude. It sleeps when nothing's happening,
 wakes when sessions start, gets visibly impatient when an approval prompt is
 waiting, and lets you approve or deny right from the device.
