@@ -156,7 +156,11 @@ static uint8_t lastDrawnSpecies = 0xFF;
 void buddyInvalidate() { lastDrawnState = 0xFF; }
 
 void buddySetPeek(bool peek) {
+#ifdef M5STACK_FIRE
+  uint8_t s = peek ? 1 : 3;
+#else
   uint8_t s = peek ? 1 : 2;
+#endif
   if (s == _scale) return;
   _scale = s;
   buddyInvalidate();

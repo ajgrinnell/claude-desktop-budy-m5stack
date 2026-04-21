@@ -129,7 +129,8 @@ static bool isFaceDown() {
 
 static void applyBrightness() {
 #ifdef M5STACK_FIRE
-  M5.Lcd.setBrightness(51 + brightLevel * 51);   // 51,102,153,204,255
+  static const uint8_t _bv[5] = {100, 140, 180, 220, 255};
+  M5.Lcd.setBrightness(_bv[brightLevel]);
 #else
   M5.Axp.ScreenBreath(20 + brightLevel * 20);
 #endif
