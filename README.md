@@ -17,15 +17,15 @@ wakes when sessions start, gets visibly impatient when an approval prompt is
 waiting, and lets you approve or deny right from the device.
 
 <p align="center">
-  <img src="docs/device.jpg" alt="M5StickC Plus running the buddy firmware" width="500">
+  <img src="docs/device_fire.webp" alt="M5Stack Core Fire running the buddy firmware" width="500">
 </p>
 
 ## Hardware
 
-The firmware targets ESP32 with the Arduino framework. As written, it
-depends on the M5StickCPlus library for its display, IMU, and button
-drivers—so you'll need that board, or a fork that swaps those drivers for
-your own pin layout.
+The firmware targets the **M5Stack Core Fire** (ESP32, 320×240 ILI9342 display,
+MPU6886 IMU, IP5306 power, 10× WS2812B NeoPixel bar). Build with the
+`m5stack-fire` PlatformIO environment. The original M5StickC Plus target
+(`m5stickc-plus`) is still supported in the same source tree.
 
 ## Flashing
 
@@ -34,13 +34,13 @@ Install
 then:
 
 ```bash
-pio run -t upload
+pio run -e m5stack-fire -t upload
 ```
 
 If you're starting from a previously-flashed device, wipe it first:
 
 ```bash
-pio run -t erase && pio run -t upload
+pio run -e m5stack-fire -t erase && pio run -e m5stack-fire -t upload
 ```
 
 Once running, you can also wipe everything from the device itself: **hold A
@@ -68,15 +68,14 @@ If discovery isn't finding the stick:
 
 ## Controls
 
-|                         | Normal               | Pet         | Info        | Approval    |
-| ----------------------- | -------------------- | ----------- | ----------- | ----------- |
-| **A** (front)           | next screen          | next screen | next screen | **approve** |
-| **B** (right)           | scroll transcript    | next page   | next page   | **deny**    |
-| **Hold A**              | menu                 | menu        | menu        | menu        |
-| **Power** (left, short) | toggle screen off    |             |             |             |
-| **Power** (left, ~6s)   | hard power off       |             |             |             |
-| **Shake**               | dizzy                |             |             | —           |
-| **Face-down**           | nap (energy refills) |             |             |             |
+|                       | Normal               | Pet         | Info        | Approval    |
+| --------------------- | -------------------- | ----------- | ----------- | ----------- |
+| **A** (left)          | next screen          | next screen | next screen | **approve** |
+| **B** (middle)        | scroll transcript    | next page   | next page   | **deny**    |
+| **C** (right)         | toggle screen off    |             |             |             |
+| **Hold A**            | menu                 | menu        | menu        | menu        |
+| **Shake**             | dizzy                |             |             | —           |
+| **Face-down**         | nap (energy refills) |             |             |             |
 
 The screen auto-powers-off after 30s of no interaction (kept on while an
 approval prompt is up). Any button press wakes it.
@@ -122,7 +121,7 @@ State values can be a single filename or an array. Arrays rotate: each
 loop-end advances to the next GIF, useful for an idle activity carousel so
 the home screen doesn't loop one clip forever.
 
-GIFs are 96px wide; height up to ~140px stays on a 135×240 portrait screen.
+GIFs are 96px wide; height up to ~140px fits within the character area on screen.
 Crop tight to the character — transparent margins waste screen and shrink
 the sprite. `tools/prep_character.py` handles the resize: feed it source
 GIFs at any sizes and it produces a 96px-wide set where the character is the
