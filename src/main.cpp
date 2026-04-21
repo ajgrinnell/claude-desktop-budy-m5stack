@@ -621,15 +621,17 @@ void drawInfo() {
 #ifdef M5STACK_FIRE
     bool charging = M5.Power.isCharging();
     bool full     = M5.Power.isChargeFull();
+    int  batPct   = ip5306BatPct();
 
     spr.setTextSize(2);
     spr.setCursor(4, y);
     spr.setTextColor(p.text, p.bg);
-    spr.print(full ? "full" : (charging ? "charging" : "battery"));
+    if (batPct > 0) spr.printf("%d%%", batPct);
+    else            spr.print(full ? "full" : (charging ? "charging" : "battery"));
     spr.setTextSize(1);
     spr.setTextColor(full ? GREEN : (charging ? HOT : p.textDim), p.bg);
     spr.setCursor(100, y + 4);
-    spr.print(_onUsb ? "usb" : "");
+    spr.print(full ? "full" : (charging ? "charging" : (_onUsb ? "usb" : "battery")));
     y += 20;
 
     spr.setTextColor(p.text, p.bg);

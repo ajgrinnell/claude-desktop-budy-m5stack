@@ -78,6 +78,20 @@ const char* ownerName();
 #include <M5StickCPlus.h>
 #endif
 
+// IP5306 battery level: addr 0x75, reg 0x78, bits[7:5] → 4 steps
+#ifdef M5STACK_FIRE
+static inline int ip5306BatPct() {
+  Wire.beginTransmission(0x75);
+  Wire.write(0x78);
+  Wire.endTransmission(false);
+  Wire.requestFrom((uint8_t)0x75, (uint8_t)1);
+  if (!Wire.available()) return -1;
+  uint8_t reg = Wire.read();
+  uint8_t lv = reg & 0xE0;
+  return lv == 0xE0 ? 25 : lv == 0xC0 ? 50 : lv == 0x80 ? 75 : 100;
+}
+#endif
+
 inline bool xferCommand(JsonDocument& doc) {
   const char* cmd = doc["cmd"];
   if (!cmd) return false;
@@ -116,16 +130,17 @@ inline bool xferCommand(JsonDocument& doc) {
   if (strcmp(cmd, "status") == 0) {
 #ifdef M5STACK_FIRE
     bool charging = M5.Power.isCharging();
+    int pct = ip5306BatPct();
     char b[320];
     int len = snprintf(b, sizeof(b),
       "{\"ack\":\"status\",\"ok\":true,\"n\":0,\"data\":{"
       "\"name\":\"%s\",\"owner\":\"%s\",\"sec\":%s,"
-      "\"bat\":{\"pct\":-1,\"mV\":-1,\"mA\":-1,\"usb\":%s},"
+      "\"bat\":{\"pct\":%d,\"mV\":-1,\"mA\":-1,\"usb\":%s},"
       "\"sys\":{\"up\":%lu,\"heap\":%u,\"fsFree\":%lu,\"fsTotal\":%lu},"
       "\"stats\":{\"appr\":%u,\"deny\":%u,\"vel\":%u,\"nap\":%lu,\"lvl\":%u}"
       "}}\n",
       petName(), ownerName(), bleSecure() ? "true" : "false",
-      charging ? "true" : "false",
+      pct, charging ? "true" : "false",
       millis() / 1000, ESP.getFreeHeap(),
       (unsigned long)(LittleFS.totalBytes() - LittleFS.usedBytes()),
       (unsigned long)LittleFS.totalBytes(),
