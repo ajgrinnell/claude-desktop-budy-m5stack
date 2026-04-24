@@ -359,7 +359,6 @@ void menuConfirm() {
     case 1:
       userRotation = (userRotation + 1) % 4;
       applyScreenRotation();
-      menuOpen = false;
       break;
     case 2:
 #ifdef M5STACK_FIRE
