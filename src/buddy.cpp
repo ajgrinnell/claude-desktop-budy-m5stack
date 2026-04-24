@@ -55,7 +55,7 @@ void buddyPrintLine(const char* line, int yPx, uint16_t color, int xOff) {
     while (len && *line == ' ')       { line++; len--; }
   }
   int w = len * BUDDY_CHAR_W * _scale;
-  int x = BUDDY_X_CENTER - w / 2 + xOff * _scale;
+  int x = _tgt->width() / 2 - w / 2 + xOff * _scale;
   _tgt->setTextColor(color, BUDDY_BG);
   _tgt->setCursor(x, yPx);
   for (int i = 0; i < len; i++) _tgt->print(line[i]);
@@ -72,7 +72,8 @@ void buddyPrintSprite(const char* const* lines, uint8_t nLines, int yOffset, uin
 // Species pass 1× coords (relative to BUDDY_X_CENTER / BUDDY_Y_OVERLAY);
 // transform here so all 18 species files stay scale-agnostic.
 void buddySetCursor(int x, int y) {
-  _tgt->setCursor(BUDDY_X_CENTER + (x - BUDDY_X_CENTER) * _scale, y * _scale);
+  int cx = _tgt->width() / 2;
+  _tgt->setCursor(cx + (x - BUDDY_X_CENTER) * _scale, y * _scale);
 }
 void buddySetColor(uint16_t fg)   { _tgt->setTextColor(fg, BUDDY_BG); }
 void buddyPrint(const char* s)    { _tgt->setTextSize(_scale); _tgt->print(s); }
@@ -156,11 +157,13 @@ static uint8_t lastDrawnSpecies = 0xFF;
 void buddyInvalidate() { lastDrawnState = 0xFF; }
 
 void buddySetPeek(bool peek) {
-#ifdef M5STACK_FIRE
-  uint8_t s = peek ? 1 : 3;
-#else
-  uint8_t s = peek ? 1 : 2;
-#endif
+  uint8_t s;
+  if (peek) {
+    s = 1;
+  } else {
+    int w = spr.width();
+    s = (w >= 280) ? 3 : (w >= 100) ? 2 : 1;
+  }
   if (s == _scale) return;
   _scale = s;
   buddyInvalidate();
@@ -201,7 +204,7 @@ void buddyTick(uint8_t personaState) {
   lastDrawnSpecies = currentSpeciesIdx;
 
   // Clear the whole render strip — at 2× the body reaches y≈126, at 1× ≈82.
-  spr.fillRect(0, 0, BUDDY_CANVAS_W,
+  spr.fillRect(0, 0, spr.width(),
                (BUDDY_Y_BASE + 5 * BUDDY_CHAR_H + 12) * _scale, BUDDY_BG);
 
   const Species* sp = SPECIES_TABLE[currentSpeciesIdx];
