@@ -27,11 +27,13 @@ static void startBt() {
 #include "stats.h"
 
 #ifdef M5STACK_FIRE
-const int W = 320, H = 240;
+int W = 320, H = 240;
+static const uint8_t BASE_ROT = 1;
 #else
-const int W = 135, H = 240;
+int W = 135, H = 240;
+static const uint8_t BASE_ROT = 0;
 #endif
-const int CX = W / 2;
+int CX = W / 2;
 const int CY_BASE = 120;
 
 // Colors used across multiple UI surfaces
@@ -81,6 +83,8 @@ bool    menuOpen    = false;
 uint8_t menuSel     = 0;
 uint8_t brightLevel = 4;           // 0..4
 bool    btnALong    = false;
+uint8_t userRotation = 0;          // 0-3: added to BASE_ROT; persisted in settings
+static uint8_t effectiveRot() { return (uint8_t)((BASE_ROT + userRotation) % 4); }
 
 enum DisplayMode { DISP_NORMAL, DISP_PET, DISP_INFO, DISP_COUNT };
 uint8_t displayMode = DISP_NORMAL;
@@ -182,8 +186,20 @@ void applyDisplayMode() {
   buddyInvalidate();
 }
 
-const char* menuItems[] = { "settings", "turn off", "help", "about", "demo", "close" };
-const uint8_t MENU_N = 6;
+static void applyScreenRotation() {
+  M5.Lcd.setRotation(effectiveRot());
+  W  = M5.Lcd.width();
+  H  = M5.Lcd.height();
+  CX = W / 2;
+  spr.deleteSprite();
+  spr.createSprite(W, H);
+  settings().screenRot = userRotation;
+  settingsSave();
+  applyDisplayMode();
+}
+
+const char* menuItems[] = { "settings", "rotate", "turn off", "help", "about", "demo", "close" };
+const uint8_t MENU_N = 7;
 
 bool    settingsOpen = false;
 uint8_t settingsSel  = 0;
@@ -341,6 +357,11 @@ void menuConfirm() {
   switch (menuSel) {
     case 0: settingsOpen = true; menuOpen = false; settingsSel = 0; break;
     case 1:
+      userRotation = (userRotation + 1) % 4;
+      applyScreenRotation();
+      menuOpen = false;
+      break;
+    case 2:
 #ifdef M5STACK_FIRE
       // Deep sleep as power-off; wake on BtnA press (GPIO 39, active-low)
       esp_sleep_enable_ext0_wakeup((gpio_num_t)39, 0);
@@ -349,16 +370,16 @@ void menuConfirm() {
       M5.Axp.PowerOff();
 #endif
       break;
-    case 2:
     case 3:
+    case 4:
       menuOpen = false;
       displayMode = DISP_INFO;
-      infoPage = (menuSel == 2) ? INFO_PG_BUTTONS : INFO_PG_CREDITS;
+      infoPage = (menuSel == 3) ? INFO_PG_BUTTONS : INFO_PG_CREDITS;
       applyDisplayMode();
       characterInvalidate();
       break;
-    case 4: dataSetDemo(!dataDemo()); break;
-    case 5: menuOpen = false; characterInvalidate(); break;
+    case 5: dataSetDemo(!dataDemo()); break;
+    case 6: menuOpen = false; characterInvalidate(); break;
   }
 }
 
@@ -376,7 +397,8 @@ void drawMenu() {
     spr.setCursor(mx + 6, my + 8 + i * 14);
     spr.print(sel ? "> " : "  ");
     spr.print(menuItems[i]);
-    if (i == 4) spr.print(dataDemo() ? "  on" : "  off");
+    if (i == 1) { spr.setTextColor(p.textDim, PANEL); spr.printf("  %u", userRotation * 90); }
+    if (i == 5) spr.print(dataDemo() ? "  on" : "  off");
   }
   drawMenuHints(p, mx, mw, my + mh - 12);
 }
@@ -491,7 +513,7 @@ static void drawClock() {
       characterRenderTo(&M5.Lcd, 57, 45);
     }
   }
-  M5.Lcd.setRotation(0);
+  M5.Lcd.setRotation(effectiveRot());
 }
 #endif  // !M5STACK_FIRE
 
@@ -1012,6 +1034,13 @@ void setup() {
   statsLoad();
   settingsLoad();
   petNameLoad();
+  userRotation = settings().screenRot;
+  if (userRotation > 0) {
+    M5.Lcd.setRotation(effectiveRot());
+    W  = M5.Lcd.width();
+    H  = M5.Lcd.height();
+    CX = W / 2;
+  }
   buddyInit();
 
   spr.createSprite(W, H);

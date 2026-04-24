@@ -182,10 +182,11 @@ struct Settings {
   bool wifi;     // placeholder — no WiFi stack linked yet, just stores the pref
   bool led;
   bool hud;
-  uint8_t clockRot;  // 0=auto 1=portrait 2=landscape
+  uint8_t clockRot;   // 0=auto 1=portrait 2=landscape
+  uint8_t screenRot;  // 0-3: user rotation offset (added to platform base rotation)
 };
 
-static Settings _settings = { true, true, false, true, true, 0 };
+static Settings _settings = { true, true, false, true, true, 0, 0 };
 
 inline void settingsLoad() {
   _prefs.begin("buddy", true);
@@ -194,8 +195,10 @@ inline void settingsLoad() {
   _settings.wifi  = _prefs.getBool("s_wifi",false);
   _settings.led   = _prefs.getBool("s_led", true);
   _settings.hud      = _prefs.getBool("s_hud", true);
-  _settings.clockRot = _prefs.getUChar("s_crot", 0);
+  _settings.clockRot  = _prefs.getUChar("s_crot", 0);
   if (_settings.clockRot > 2) _settings.clockRot = 0;
+  _settings.screenRot = _prefs.getUChar("s_rot", 0);
+  if (_settings.screenRot > 3) _settings.screenRot = 0;
   _prefs.end();
 }
 
@@ -207,6 +210,7 @@ inline void settingsSave() {
   _prefs.putBool("s_led", _settings.led);
   _prefs.putBool("s_hud", _settings.hud);
   _prefs.putUChar("s_crot", _settings.clockRot);
+  _prefs.putUChar("s_rot",  _settings.screenRot);
   _prefs.end();
 }
 
