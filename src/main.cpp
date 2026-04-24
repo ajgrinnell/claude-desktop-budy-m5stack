@@ -378,7 +378,7 @@ void menuConfirm() {
       characterInvalidate();
       break;
     case 5: dataSetDemo(!dataDemo()); break;
-    case 6: menuOpen = false; characterInvalidate(); break;
+    case 6: menuOpen = false; applyDisplayMode(); break;
   }
 }
 
@@ -1165,7 +1165,7 @@ void loop() {
     else {
       menuOpen = !menuOpen;
       menuSel = 0;
-      if (!menuOpen) characterInvalidate();
+      if (!menuOpen) applyDisplayMode();
     }
     Serial.println(menuOpen ? "menu open" : "menu close");
   }
