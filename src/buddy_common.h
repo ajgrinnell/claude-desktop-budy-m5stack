@@ -25,7 +25,7 @@ extern const uint16_t BUDDY_PURPLE;
 extern const uint16_t BUDDY_RED;
 extern const uint16_t BUDDY_BLUE;
 
-// Print one line centered around BUDDY_X_CENTER, optionally x-offset.
+// Print one line centered on the render target width, optionally x-offset.
 void buddyPrintLine(const char* line, int yPx, uint16_t color, int xOff = 0);
 
 // Print N-line sprite block. yOffset is added to BUDDY_Y_BASE for the top row.

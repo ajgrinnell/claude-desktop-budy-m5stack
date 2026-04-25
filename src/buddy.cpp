@@ -39,9 +39,9 @@ const uint16_t BUDDY_BLUE   = 0x041F;
 
 // ──────────────── shared rendering helpers ────────────────
 // Render target indirection: defaults to the sprite, but can retarget to
-// M5.Lcd for landscape clock mode (both inherit TFT_eSPI). Coords stay
-// fixed — species hardcode BUDDY_X_CENTER/BUDDY_Y_OVERLAY in their
-// particle calls, so retargeting position would only move the body.
+// M5.Lcd for landscape clock mode (both inherit TFT_eSPI). Horizontal
+// centering uses _tgt->width()/2 so the buddy stays centered on whatever
+// surface is active, including rotated dimensions.
 static TFT_eSPI* _tgt = &spr;
 // 2× on home screen, 1× in peek (PET/INFO) and landscape clock. Species
 // art is space-padded to a fixed width for alignment at 1×; at 2× we trim
@@ -97,13 +97,14 @@ extern const Species ROBOT_SPECIES;
 extern const Species RABBIT_SPECIES;
 extern const Species MUSHROOM_SPECIES;
 extern const Species CHONK_SPECIES;
+extern const Species SLOTH_SPECIES;
 
 static const Species* SPECIES_TABLE[] = {
   &CAPYBARA_SPECIES, &DUCK_SPECIES, &GOOSE_SPECIES, &BLOB_SPECIES,
   &CAT_SPECIES, &DRAGON_SPECIES, &OCTOPUS_SPECIES, &OWL_SPECIES,
   &PENGUIN_SPECIES, &TURTLE_SPECIES, &SNAIL_SPECIES, &GHOST_SPECIES,
   &AXOLOTL_SPECIES, &CACTUS_SPECIES, &ROBOT_SPECIES, &RABBIT_SPECIES,
-  &MUSHROOM_SPECIES, &CHONK_SPECIES,
+  &MUSHROOM_SPECIES, &CHONK_SPECIES, &SLOTH_SPECIES,
 };
 static const uint8_t N_SPECIES = sizeof(SPECIES_TABLE) / sizeof(SPECIES_TABLE[0]);
 static uint8_t currentSpeciesIdx = 0;

@@ -86,11 +86,39 @@ If discovery isn't finding the stick:
 The screen auto-powers-off after 30s of no interaction (kept on while an
 approval prompt is up). Any button press wakes it.
 
+## Menu
+
+Hold **A** from any screen to open the main menu. Press **A** to move the
+cursor, **B** to confirm the selected item.
+
+| Item         | Action                                                                 |
+| ------------ | ---------------------------------------------------------------------- |
+| **settings** | Open the settings submenu (brightness, sound, BLE, etc.)              |
+| **rotate**   | Rotate the display 90° clockwise. Press B repeatedly to keep rotating. The current angle (0 / 90 / 180 / 270) is shown next to the label. Choice persists across reboots. |
+| **turn off** | Power off (deep sleep on Core Fire, AXP power-off on StickC Plus)     |
+| **help**     | Open the button-reference info page                                    |
+| **about**    | Open the credits info page                                             |
+| **demo**     | Toggle demo mode (cycles fake Claude sessions every 8s)               |
+| **close**    | Close the menu                                                         |
+
+## Screen rotation
+
+The display can be rotated in 90° increments to suit how the device is
+mounted. Open the menu (**hold A**), navigate to **rotate**, and press **B**
+once per 90° step. The menu stays open so you can keep pressing B until the
+orientation is right, then navigate away or hold A to close.
+
+The setting survives reboots — no need to re-rotate after a power cycle.
+ASCII pets and GIF characters both scale and center correctly in every
+orientation.
+
 ## ASCII pets
 
-Eighteen pets, each with seven animations (sleep, idle, busy, attention,
-celebrate, dizzy, heart). Menu → "next pet" cycles them with a counter.
-Choice persists to NVS.
+Nineteen pets, each with seven animations (sleep, idle, busy, attention,
+celebrate, dizzy, heart): capybara, duck, goose, blob, cat, dragon, octopus,
+owl, penguin, turtle, snail, ghost, axolotl, cactus, robot, rabbit, mushroom,
+chonk, and **sloth** (legendarily slow tick rate — blink and you'll miss it).
+Menu → "next pet" cycles them with a counter. Choice persists to NVS.
 
 ## GIF pets
 

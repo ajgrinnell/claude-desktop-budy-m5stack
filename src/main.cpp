@@ -228,7 +228,7 @@ static void applySetting(uint8_t idx) {
     case 6: s.clockRot = (s.clockRot + 1) % 3; break;
     case 7: nextPet(); return;
     case 8: resetOpen = true; resetSel = 0; resetConfirmIdx = 0xFF; return;
-    case 9: settingsOpen = false; characterInvalidate(); return;
+    case 9: settingsOpen = false; applyDisplayMode(); return;
   }
   settingsSave();
 }
@@ -375,7 +375,6 @@ void menuConfirm() {
       displayMode = DISP_INFO;
       infoPage = (menuSel == 3) ? INFO_PG_BUTTONS : INFO_PG_CREDITS;
       applyDisplayMode();
-      characterInvalidate();
       break;
     case 5: dataSetDemo(!dataDemo()); break;
     case 6: menuOpen = false; applyDisplayMode(); break;
@@ -1161,7 +1160,7 @@ void loop() {
     btnALong = true;
     beep(800, 60);
     if (resetOpen) { resetOpen = false; }
-    else if (settingsOpen) { settingsOpen = false; characterInvalidate(); }
+    else if (settingsOpen) { settingsOpen = false; applyDisplayMode(); }
     else {
       menuOpen = !menuOpen;
       menuSel = 0;
